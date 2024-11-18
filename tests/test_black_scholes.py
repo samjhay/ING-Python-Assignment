@@ -5,23 +5,25 @@ from black_scholes_option_price._black_scholes import _black_d1, _black_d2
 
 
 class TestEndToEnd(TestCase):
-    forward = 19.04367
+    forward = 19.0436671781375
     strike = 17
-    time_to_expiry = 0.46
+    time_to_expiry = 0.46027397260274
     volatility = 0.3
-    interest_rate = 0.005
+    interest_rate = 0.00498754151104
 
     def test_end_to_end_call(self):
         call_put = 'call'
         bs = black_scholes_price(self.forward, self.strike, self.time_to_expiry, self.volatility, self.interest_rate,
                                  call_put)
-        self.assertEqual(bs, 2.6965050966660846)
+        # Excel floating point precision to 15 significant figures
+        self.assertAlmostEqual(bs, 2.6968842086815, places=14)
 
     def test_end_to_end_put(self):
         call_put = 'put'
         bs = black_scholes_price(self.forward, self.strike, self.time_to_expiry, self.volatility, self.interest_rate,
                                  call_put)
-        self.assertEqual(bs, 0.6575301363007771)
+        # Excel floating point precision to 15 significant figures
+        self.assertAlmostEqual(bs, 0.657903164673872, places=14)
 
 
 class TestPricing(TestCase):
