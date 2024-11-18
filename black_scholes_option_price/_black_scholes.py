@@ -53,16 +53,19 @@ def _black_d1(forward: float, strike: float, time_to_expiry: float, volatility: 
 
 
 def _black_76(forward: float, strike: float, time_to_expiry: float, volatility: float, interest_rate: float,
-              call_put: CallPut | str):
+              call_put: CallPut):
     """
+    Calculates option price for the desired option.
 
-    :param forward:
-    :param strike:
-    :param time_to_expiry:
-    :param volatility:
-    :param interest_rate:
-    :param call_put:
-    :return:
+    :param forward: The discounted value of the underlying asset at expiry time
+    :param strike: The value at which the underlying asset can be bought (call) or sold (put)
+    :param time_to_expiry: the remaining time between pricing time and expiry time, expressed in years
+    :param volatility: The expected log normal volatility of the underlying asset between pricing time and expiry,
+           expressed as volatility per year.
+    :param interest_rate: The risk-free interest rate used for the currency in which the option is to be priced
+    :param call_put: call option give the owner the right to buy the underlying. Put options give the right to sell the
+           underlying.
+    :return: The price of the option
     """
     d1 = _black_d1(forward=forward, strike=strike, time_to_expiry=time_to_expiry, volatility=volatility)
     d2 = _black_d2(forward=forward, strike=strike, time_to_expiry=time_to_expiry, volatility=volatility)
@@ -80,14 +83,19 @@ def _black_76(forward: float, strike: float, time_to_expiry: float, volatility: 
 def black_scholes_price(forward: float, strike: float, time_to_expiry: float, volatility: float,
                         interest_rate: float, call_put: CallPut | str) -> float:
     """
+    Calculates option price for the desired option.
 
-    :param forward:
-    :param strike:
-    :param time_to_expiry:
-    :param volatility:
-    :param interest_rate:
-    :param call_put:
-    :return:
+    Edge cases including 0>= time-to-expiry, 0>= strike, 0>= volatility and 0>=forward are all handled.
+
+    :param forward: The discounted value of the underlying asset at expiry time
+    :param strike: The value at which the underlying asset can be bought (call) or sold (put)
+    :param time_to_expiry: the remaining time between pricing time and expiry time, expressed in years
+    :param volatility: The expected log normal volatility of the underlying asset between pricing time and expiry,
+           expressed as volatility per year.
+    :param interest_rate: The risk-free interest rate used for the currency in which the option is to be priced
+    :param call_put: call option give the owner the right to buy the underlying. Put options give the right to sell the
+           underlying. Use 'call' for a call option and 'put' for a put option.
+    :return: The price of the option.
     """
     call_put = call_put if isinstance(call_put, CallPut) else CallPut(call_put)
 
@@ -100,6 +108,7 @@ def black_scholes_price(forward: float, strike: float, time_to_expiry: float, vo
 
     if time_to_expiry <= 0.:
         # edge case if option has expired and it's intrinsic value is required
+        logger.warning('Option has expired. Ensure that value for forward is the settlement level of the underlying')
         if call_put is CallPut.PUT:
             return np.maximum(0, strike - forward)
         if call_put is CallPut.CALL:

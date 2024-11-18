@@ -1,1 +1,1 @@
-from black_scholes_option_price._black_scholes import black_scholes_price
+from black_scholes_option_price._black_scholes import black_scholes_price, InvalidPriceParametersException
